@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const connectDB = require("../backend/config/db");
 const app = express();
 const userRoutes = require("../backend/routes/userRoutes");
+const chatRoutes = require("../backend/routes/chatRoutes");
 const {
   errorHandler,
   notFound,
@@ -15,9 +16,7 @@ app.use(express.json());
 
 app.use("/api/user", userRoutes);
 
-app.get("/api/chats", (req, res) => {
-  res.send([{ chat: "Chats will be displayed" }, { chat: "Hello" }]);
-});
+app.use("/api/chats", chatRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
