@@ -13,11 +13,11 @@ import { useToast } from "@chakra-ui/toast";
 import { useHistory } from "react-router";
 
 const SignUp = () => {
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
-  const [pic, setPic] = useState();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pic, setPic] = useState("");
   const [show, setShow] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
   const handleShowButton = () => setShow(!show);

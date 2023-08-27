@@ -14,8 +14,8 @@ import { useHistory } from "react-router";
 import { useToast } from "@chakra-ui/toast";
 
 const Login = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const handleShowButton = () => setShow(!show);
