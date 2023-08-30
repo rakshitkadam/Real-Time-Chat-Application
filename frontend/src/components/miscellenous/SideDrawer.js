@@ -82,8 +82,6 @@ const SideDrawer = () => {
         },
       };
       const { data } = await axios.post("/api/chats/", { userId }, config);
-      console.log("HI)");
-      console.log(chats);
       if (!chats.find((c) => c._id === data._id)) {
         setChats([data, ...chats]);
       }
