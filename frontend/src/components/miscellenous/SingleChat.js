@@ -1,13 +1,6 @@
 import React, { useEffect } from "react";
 import { ChatState } from "../../context/ChatProvider";
-import {
-  Box,
-  FormControl,
-  Spinner,
-  Text,
-  useFocusEffect,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, FormControl, Spinner, Text, useToast } from "@chakra-ui/react";
 import { IconButton } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { getSender } from "../../helper/ChatLogic";
