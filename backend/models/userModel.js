@@ -21,7 +21,6 @@ userModelSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 userModelSchema.pre("save", async function (next) {
-  console.log(this);
   if (!this.isModified) {
     next();
   }

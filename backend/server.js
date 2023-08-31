@@ -9,7 +9,7 @@ const {
   errorHandler,
   notFound,
 } = require("../backend/middlewares/errorMiddleware");
-
+const path = require("path");
 dotenv.config();
 connectDB();
 
@@ -18,6 +18,19 @@ app.use(express.json());
 app.use("/api/user", userRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);
+//---------------------------Deployment---------------------------------
+const __dirname1 = path.resolve();
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/frontend/build")));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("Code is running in development mode");
+  });
+}
+//---------------------------Deployment---------------------------------
 app.use(notFound);
 app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
@@ -43,16 +56,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new message", (newMessageReceived) => {
-    console.log(newMessageReceived);
     newMessageReceived.chat.users.forEach((user) => {
       if (newMessageReceived.sender._id === user._id) return;
       socket.in(user._id).emit("message received", newMessageReceived);
     });
   });
+
   socket.on("typing", (room) => {
     socket.in(room).emit("typing");
   });
+
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
   socket.off("setup", () => {
     console.log("USER DISCONNECTED");
     socket.leave(userData._id);
