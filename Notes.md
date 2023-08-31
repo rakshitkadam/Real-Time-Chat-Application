@@ -1,7 +1,7 @@
 My Notes :
 
 1) Note that in the SingleChat.js, we have two useEffects, one to fetchMessages whenever the selectedChat is changed and other useEffect
-to do the socket setup with client (where user data is sent).
+to do the socket setup with client.
 
 2) Sockets in context of this project : The way the sockets work is, their are two parts: client and server:
     a) client will establish a connection with server (socket).
