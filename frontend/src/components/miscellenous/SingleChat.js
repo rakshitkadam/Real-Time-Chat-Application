@@ -17,7 +17,7 @@ import Lottie from "react-lottie";
 import animationData from "../../animations/typing.json";
 
 const ENDPOINT = "http://localhost:5000";
-let socket, selectedChatCompare, timer;
+var socket, recentSelectedChat, timer;
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { user, selectedChat, setSelectedChat, notification, setNotification } =
     ChatState();
@@ -28,7 +28,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [userTyping, setUserTyping] = useState(false);
   const [senderTyping, setSenderTyping] = useState(false);
   const toast = useToast();
-  let lastSele;
+
   const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -69,11 +69,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     fetchMessages();
+    recentSelectedChat = selectedChat;
+    console.log(selectedChat);
   }, [selectedChat]);
 
   useEffect(() => {
     socket.on("message received", (newMessageReceived) => {
-      if (!selectedChat || selectedChat._id !== newMessageReceived.chat._id) {
+      if (
+        !recentSelectedChat ||
+        recentSelectedChat._id !== newMessageReceived.chat._id
+      ) {
         // notification
         setNotification([newMessageReceived, ...notification]);
         // As new messages are received, so a re-render of component would be required, fetching new messages
