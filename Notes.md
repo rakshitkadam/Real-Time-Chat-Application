@@ -12,6 +12,9 @@ to do the socket setup with client.
    socket as 1:1 mappping of client with server, so if two clients are present, so two sockets would be present(client1:backend , client2: 
    backend).Although the backend has only one instance running, but it will have two different sockets. The code on backend is responsible 
    to connect the socket to a specific room
+   Note: In sockets, whenever we emit a event in a room, the event will be broadcasted to all sockets in the room except the sender,
+   that is the reason why when we event of typing, the event doesn't return to sender, or else the moment he started to type, he would have
+   also got the typing indicator
 
    * In backend, we joined the socket to room which is user._id, so that whenenver other user sends a message, the frontend will emit the
      event {"new message", newMessage} and then backend will listen that, and send it to all users in the group via event {"messsage 
