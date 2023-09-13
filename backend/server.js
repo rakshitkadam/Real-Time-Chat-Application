@@ -5,6 +5,7 @@ const app = express();
 const userRoutes = require("../backend/routes/userRoutes");
 const chatRoutes = require("../backend/routes/chatRoutes");
 const messageRoutes = require("../backend/routes/messageRoutes");
+const notificationRoutes = require("../backend/routes/notificationRoutes");
 const {
   errorHandler,
   notFound,
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/api/user", userRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/notification", notificationRoutes);
 //---------------------------Deployment---------------------------------
 const __dirname1 = path.resolve();
 if (process.env.NODE_ENV === "production") {

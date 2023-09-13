@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { useToast } from "@chakra-ui/toast";
 import { useHistory } from "react-router";
+import validator from "validator";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -24,6 +25,10 @@ const SignUp = () => {
   const toast = useToast();
   const history = useHistory();
 
+  const isValidEmail = (email) => {
+    return validator.isEmail(email);
+  };
+
   const postPicture = (pics) => {
     setPicLoading(true);
     if (pics === undefined) {
@@ -36,6 +41,7 @@ const SignUp = () => {
       });
       return;
     }
+
     if (pics.type === "image/jpeg" || pics.type === "image/png") {
       const data = new FormData();
       data.append("file", pics);
@@ -67,11 +73,23 @@ const SignUp = () => {
       return;
     }
   };
+
   const submitHandler = async () => {
     setPicLoading(true);
     if (!name || !email || !password || !confirmPassword) {
       toast({
         title: "Please fill all the fields!",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setPicLoading(false);
+      return;
+    }
+    if (!isValidEmail(email)) {
+      toast({
+        title: "Please enter valid email",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -91,12 +109,14 @@ const SignUp = () => {
       setPicLoading(false);
       return;
     }
+
     try {
       const config = {
         headers: {
           "Content-type": "application/json",
         },
       };
+
       const { data } = await axios.post(
         "/api/user",
         { name, email, password, pic },

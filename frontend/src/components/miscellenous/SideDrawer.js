@@ -21,7 +21,7 @@ import {
   MenuList,
 } from "@chakra-ui/menu";
 import { Input } from "@chakra-ui/input";
-
+import { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 
@@ -108,6 +108,31 @@ const SideDrawer = () => {
       });
     }
   };
+  const fetchNotifications = async () => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.get("/api/notification", config);
+      setNotification([...data]);
+      console.log(data);
+    } catch (error) {
+      toast({
+        title: "Error fetching the notifications",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
   return (
     <>
       <Box
@@ -146,6 +171,9 @@ const SideDrawer = () => {
                   key={notific._id}
                   onClick={() => {
                     setSelectedChat(notific.chat);
+                    //edit this to : (elem) => elem.chat._id !== notific.chat._id
+                    // so that all notifications belonging to same chat id will disappear
+
                     setNotification(
                       notification.filter((elem) => elem !== notific)
                     );

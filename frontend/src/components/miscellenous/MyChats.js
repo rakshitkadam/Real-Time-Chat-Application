@@ -11,7 +11,9 @@ import { getSender } from "../../helper/ChatLogic";
 import GroupChatModal from "./GroupChatModal";
 const MyChats = ({ fetchAgain }) => {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
-  const [loggedUser, setLoggedUser] = useState();
+  //initializing the loggedUser with dummy id, so that when we call getSender(line 101), we dont run into undefined user
+  //as useEffect will be parsing the user(till that time user will be undefined)
+  const [loggedUser, setLoggedUser] = useState({ _id: -1 });
   const toast = useToast();
 
   const fetchChats = async () => {
@@ -21,7 +23,6 @@ const MyChats = ({ fetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-
       const { data } = await axios.get("/api/chats", config);
       setChats(data);
     } catch (error) {
