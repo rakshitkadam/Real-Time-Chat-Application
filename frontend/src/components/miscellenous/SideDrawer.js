@@ -132,7 +132,11 @@ const SideDrawer = () => {
   useEffect(() => {
     fetchNotifications();
   }, []);
-
+  const getChatFromChatId = (chatId) => {
+    const chat = chats.find((ele) => ele._id === chatId);
+    if (chat) return chat;
+    else throw new Error(`Chat with ID = ${chatId} does not exist`);
+  };
   return (
     <>
       <Box
@@ -170,12 +174,11 @@ const SideDrawer = () => {
                 <MenuItem
                   key={notific._id}
                   onClick={() => {
-                    setSelectedChat(notific.chat);
-                    //edit this to : (elem) => elem.chat._id !== notific.chat._id
-                    // so that all notifications belonging to same chat id will disappear
-
+                    setSelectedChat(getChatFromChatId(notific.chat._id));
                     setNotification(
-                      notification.filter((elem) => elem !== notific)
+                      notification.filter(
+                        (elem) => elem.chat._id !== notific.chat._id
+                      )
                     );
                   }}
                 >
