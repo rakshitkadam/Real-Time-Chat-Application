@@ -44,4 +44,19 @@ const fetchNotification = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { sendNotification, fetchNotification };
+const deleteNotification = asyncHandler(async (req, res) => {
+  const notificationId = req.params.id;
+  try {
+    console.log(notificationId);
+    let notification = await Notification.findOneAndDelete({
+      _id: notificationId,
+    });
+    console.log(notification);
+    return res.send(notification);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+module.exports = { sendNotification, fetchNotification, deleteNotification };
