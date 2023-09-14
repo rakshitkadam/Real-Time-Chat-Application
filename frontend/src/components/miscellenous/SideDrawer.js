@@ -133,7 +133,7 @@ const SideDrawer = () => {
     fetchNotifications();
   }, []);
   const getChatFromChatId = (chatId) => {
-    const chat = chats.find((ele) => ele._id === chatId);
+    const chat = chats.find((ele) => ele._id.equals(chatId));
     if (chat) return chat;
     else throw new Error(`Chat with ID = ${chatId} does not exist`);
   };

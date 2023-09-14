@@ -44,19 +44,73 @@ const fetchNotification = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteNotification = asyncHandler(async (req, res) => {
+const updateNotificationNotSeenBy = asyncHandler(async (req, res) => {
+  // this api updates the notificationNotSeenBy, removes the current user from it as its viewed by the user
   const notificationId = req.params.id;
+  if (!notificationId) {
+    console.log("NotificationId  is null");
+    return res.status(400);
+  }
   try {
-    console.log(notificationId);
-    let notification = await Notification.findOneAndDelete({
+    let notification = await Notification.findOne({
       _id: notificationId,
-    });
-    console.log(notification);
-    return res.send(notification);
+    })
+      .populate("chat")
+      .populate("notificationNotSeenBy", "-password");
+
+    if (
+      !notification.notificationNotSeenBy.find((ele) =>
+        ele._id.equals(req.user._id)
+      )
+    ) {
+      throw new Error(
+        "User is already removed from the notificationNotSeenBy list"
+      );
+    }
+
+    if (notification.notificationNotSeenBy.length === 1) {
+      //  the only remaining person to view notification has viewed it, we need to delete the
+      //  notification from db
+      notification = await deleteNotification(notificationId);
+      console.log(`${notification} is deleted`);
+      res.send(notification);
+    } else {
+      let updatedNotificationNotSeenBy =
+        notification.notificationNotSeenBy.filter(
+          (ele) => !ele._id.equals(req.user._id)
+        );
+
+      let updatedNotification = await Notification.findByIdAndUpdate(
+        notificationId,
+        {
+          notificationNotSeenBy: updatedNotificationNotSeenBy,
+        },
+        {
+          new: true,
+        }
+      );
+      res.send(updatedNotification);
+    }
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
   }
 });
 
-module.exports = { sendNotification, fetchNotification, deleteNotification };
+const deleteNotification = async (notificationId) => {
+  try {
+    let notification = await Notification.findOneAndDelete({
+      _id: notificationId,
+    });
+    return notification;
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+};
+
+module.exports = {
+  sendNotification,
+  fetchNotification,
+  updateNotificationNotSeenBy,
+};
