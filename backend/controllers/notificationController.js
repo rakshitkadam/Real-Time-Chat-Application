@@ -2,23 +2,23 @@ const asyncHandler = require("express-async-handler");
 const Notification = require("../models/notificationModel");
 const User = require("../models/userModel");
 const sendNotification = asyncHandler(async (req, res) => {
-  const { chat, notifiedUsers } = req.body;
-  if (!chat || !notifiedUsers) {
-    console.log("Chat Id  or notifiedUsers list is null");
+  const { chat, notificationNotSeenBy } = req.body;
+  if (!chat || !notificationNotSeenBy) {
+    console.log("Chat Id  or notificationNotSeenBy list is null");
     return res.status(400);
   }
-  let parsedNotifiedUsers = JSON.parse(notifiedUsers);
+  let parsednotificationNotSeenBy = JSON.parse(notificationNotSeenBy);
   try {
     let newNotification = {
       chat: chat,
-      notifiedUsers: parsedNotifiedUsers,
+      notificationNotSeenBy: parsednotificationNotSeenBy,
     };
     let notification = await Notification.create(newNotification);
     notification = await Notification.findOne({
       _id: notification._id,
     })
       .populate("chat")
-      .populate("notifiedUsers", "-password");
+      .populate("notificationNotSeenBy", "-password");
 
     return res.send(notification);
   } catch (error) {
@@ -30,7 +30,7 @@ const sendNotification = asyncHandler(async (req, res) => {
 const fetchNotification = asyncHandler(async (req, res) => {
   try {
     let notifications = await Notification.find({
-      notifiedUsers: { $in: [req.user._id] },
+      notificationNotSeenBy: { $in: [req.user._id] },
     }).populate("chat");
     notifications = await User.populate(notifications, {
       path: "chat.users",

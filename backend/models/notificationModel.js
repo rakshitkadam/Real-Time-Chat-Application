@@ -6,7 +6,7 @@ const notificationModelSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Chats",
     },
-    notifiedUsers: [
+    notificationNotSeenBy: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
