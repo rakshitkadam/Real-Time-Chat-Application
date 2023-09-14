@@ -57,7 +57,11 @@ const updateNotificationNotSeenBy = asyncHandler(async (req, res) => {
     })
       .populate("chat")
       .populate("notificationNotSeenBy", "-password");
-
+    if (!notification) {
+      throw new Error(
+        `Notification with id = ${notificationId} does not exist`
+      );
+    }
     if (
       !notification.notificationNotSeenBy.find((ele) =>
         ele._id.equals(req.user._id)
@@ -67,7 +71,7 @@ const updateNotificationNotSeenBy = asyncHandler(async (req, res) => {
         "User is already removed from the notificationNotSeenBy list"
       );
     }
-
+    console.log(notification);
     if (notification.notificationNotSeenBy.length === 1) {
       //  the only remaining person to view notification has viewed it, we need to delete the
       //  notification from db

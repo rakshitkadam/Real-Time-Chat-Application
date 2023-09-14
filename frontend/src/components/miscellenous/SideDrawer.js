@@ -58,7 +58,7 @@ const SideDrawer = () => {
   const handleSearch = async () => {
     if (!search) {
       toast({
-        title: "Please Enter something in search",
+        title: "Please enter something in search",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -79,6 +79,17 @@ const SideDrawer = () => {
     } catch (error) {
       throw new Error(error.message);
     }
+  };
+  const updateNotificationSeenBy = async (viewedNotifications) => {
+    viewedNotifications.forEach((notific) => {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      // purposely not adding await as this operation can be done without waiting to complete
+      axios.put(`/api/notification/update/${notific._id}`, {}, config);
+    });
   };
   const accessChat = async (userId) => {
     try {
@@ -117,7 +128,6 @@ const SideDrawer = () => {
       };
       const { data } = await axios.get("/api/notification", config);
       setNotification([...data]);
-      console.log(data);
     } catch (error) {
       toast({
         title: "Error fetching the notifications",
@@ -133,7 +143,8 @@ const SideDrawer = () => {
     fetchNotifications();
   }, []);
   const getChatFromChatId = (chatId) => {
-    const chat = chats.find((ele) => ele._id.equals(chatId));
+    console.log(chats);
+    const chat = chats.find((ele) => ele._id === chatId);
     if (chat) return chat;
     else throw new Error(`Chat with ID = ${chatId} does not exist`);
   };
@@ -175,6 +186,11 @@ const SideDrawer = () => {
                   key={notific._id}
                   onClick={() => {
                     setSelectedChat(getChatFromChatId(notific.chat._id));
+                    updateNotificationSeenBy(
+                      notification.filter(
+                        (elem) => elem.chat._id === notific.chat._id
+                      )
+                    );
                     setNotification(
                       notification.filter(
                         (elem) => elem.chat._id !== notific.chat._id

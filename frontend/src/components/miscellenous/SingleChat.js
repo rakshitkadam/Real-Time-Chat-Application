@@ -85,10 +85,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         setFetchAgain(!setFetchAgain);
       } else {
         setMessages([...messages, newMessageReceived]);
+        //remove the cuurent user from notification's notificationNotSeenBy from db as user is already on the chat
       }
     });
   });
-
+  const getUsersListForNotifying = () => {
+    return selectedChat.users.filter((ele) => ele._id !== user._id);
+  };
   const sendMessage = async (event) => {
     if (event.key !== "Enter" || !newMessage) return;
     socket.emit("stop typing", selectedChat._id);
@@ -110,7 +113,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         },
         config
       );
-
+      //no need to wait here using await as this process can be done lazily
+      const sentNotification = axios.post(
+        "/api/notification",
+        {
+          chat: selectedChat._id,
+          notificationNotSeenBy: JSON.stringify(getUsersListForNotifying()),
+        },
+        config
+      );
       setMessages([...messages, data]);
       socket.emit("new message", data);
       setUserTyping(false);
