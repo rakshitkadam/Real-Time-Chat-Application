@@ -15,6 +15,7 @@ import "./styles.css";
 import io from "socket.io-client";
 import Lottie from "react-lottie";
 import animationData from "../../animations/typing.json";
+import { updateNotificationSeenBy } from "../helpers/helper";
 
 const ENDPOINT = "http://localhost:5000";
 var socket, recentSelectedChat, timer;
@@ -84,11 +85,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         // As new messages are received, so a re-render of component would be required, fetching new messages
         setFetchAgain(!setFetchAgain);
       } else {
+        console.log(newMessageReceived);
+        const notificationReceived = { _id: newMessageReceived.notificationId };
+        delete newMessageReceived.notificationId;
         setMessages([...messages, newMessageReceived]);
-        //remove the cuurent user from notification's notificationNotSeenBy from db as user is already on the chat
+        console.log(notificationReceived);
+        //remove the current user from notification's notificationNotSeenBy from db as user is already on the chat
+        //no need to wait for request to be completed
+        updateNotificationSeenBy(notificationReceived, user.token);
       }
     });
-  });
+  }, []);
   const getUsersListForNotifying = () => {
     return selectedChat.users.filter((ele) => ele._id !== user._id);
   };
@@ -105,25 +112,31 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       };
       setNewMessage("");
 
-      const { data } = await axios.post(
-        "/api/messages",
-        {
-          content: newMessage,
-          chatId: selectedChat._id,
-        },
-        config
-      );
-      //no need to wait here using await as this process can be done lazily
-      const sentNotification = axios.post(
-        "/api/notification",
-        {
-          chat: selectedChat._id,
-          notificationNotSeenBy: JSON.stringify(getUsersListForNotifying()),
-        },
-        config
-      );
-      setMessages([...messages, data]);
-      socket.emit("new message", data);
+      const [notificationResponse, messageResponse] = await Promise.all([
+        axios.post(
+          "/api/notification",
+          {
+            chat: selectedChat._id,
+            notificationNotSeenBy: JSON.stringify(getUsersListForNotifying()),
+          },
+          config
+        ),
+        axios.post(
+          "/api/messages",
+          {
+            content: newMessage,
+            chatId: selectedChat._id,
+          },
+          config
+        ),
+      ]);
+      const messageData = messageResponse.data;
+      const notificationData = notificationResponse.data;
+      setMessages([...messages, messageData]);
+      const messageSendToSocket = { ...messageData };
+      messageSendToSocket.notificationId = notificationData._id;
+      console.log(messageSendToSocket);
+      socket.emit("new message", messageSendToSocket);
       setUserTyping(false);
     } catch (error) {
       toast({

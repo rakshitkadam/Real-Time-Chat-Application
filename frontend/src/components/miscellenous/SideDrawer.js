@@ -35,6 +35,7 @@ import ProfileModal from "./ProfileModal";
 import UserListItem from "./UserAvatar/UserListItem";
 import { Spinner } from "@chakra-ui/spinner";
 import { getSender } from "../../helper/ChatLogic";
+import { updateNotificationsSeenBy } from "../helpers/helper";
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -80,17 +81,7 @@ const SideDrawer = () => {
       throw new Error(error.message);
     }
   };
-  const updateNotificationSeenBy = async (viewedNotifications) => {
-    viewedNotifications.forEach((notific) => {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      // purposely not adding await as this operation can be done without waiting to complete
-      axios.put(`/api/notification/update/${notific._id}`, {}, config);
-    });
-  };
+
   const accessChat = async (userId) => {
     try {
       setLoadingChat(true);
@@ -186,10 +177,11 @@ const SideDrawer = () => {
                   key={notific._id}
                   onClick={() => {
                     setSelectedChat(getChatFromChatId(notific.chat._id));
-                    updateNotificationSeenBy(
+                    updateNotificationsSeenBy(
                       notification.filter(
                         (elem) => elem.chat._id === notific.chat._id
-                      )
+                      ),
+                      user.token
                     );
                     setNotification(
                       notification.filter(
