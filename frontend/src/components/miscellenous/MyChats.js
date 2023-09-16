@@ -24,6 +24,7 @@ const MyChats = ({ fetchAgain }) => {
         },
       };
       const { data } = await axios.get("/api/chats", config);
+      console.log(data);
       setChats(data);
     } catch (error) {
       toast({
@@ -96,10 +97,21 @@ const MyChats = ({ fetchAgain }) => {
                 borderRadius="lg"
                 key={chat._id}
               >
-                <Text>
+                <Text style={{ fontSize: 20 }}>
                   {!chat.isGroupChat
                     ? getSender(loggedUser, chat.users)
                     : chat.chatName}
+                </Text>
+                <Text
+                  style={
+                    selectedChat !== chat
+                      ? { color: "rgb(90, 90, 90)" }
+                      : { color: "white" }
+                  }
+                >
+                  {(chat?.isGroupChat
+                    ? `${chat?.latestMessage.sender.name} :`
+                    : "") + `${chat?.latestMessage.content}`}
                 </Text>
               </Box>
             ))}
